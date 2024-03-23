@@ -1,12 +1,27 @@
-import React, { useState, useCallback } from "react";
-import { Container, Form, SubmitButton } from "./styles";
-import { FaGithub, FaPlus, FaSpinner } from "react-icons/fa";
+import React, { useState, useCallback, useEffect } from "react";
+import { Container, Form, SubmitButton, List, DeleteButton } from "./styles";
+import { FaBars, FaGithub, FaPlus, FaSpinner, FaTrash } from "react-icons/fa";
 import api from "../../services/api";
 
 export default function Home() {
   const [newRepo, setNewRepo] = useState("facebook/react");
   const [repositories, setRepositories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Get my repos at storage
+  useEffect(() => {
+    const reposStoraged = localStorage.getItem("repos");
+    if (reposStoraged) {
+      setRepositories(JSON.parse(reposStoraged));
+    }
+  }, []);
+
+  // Save my repos at storage
+  useEffect(() => {
+    localStorage.setItem("repos", JSON.stringify(repositories));
+  }, [repositories]);
 
   const handleOnSubmit = useCallback(
     (e) => {
@@ -14,17 +29,33 @@ export default function Home() {
 
       async function submit() {
         setLoading(true);
-        try {
-          const response = await api.get(`repos/${newRepo}`);
+        setError(false);
 
+        try {
+          if (newRepo === "")
+            throw new Error("O Campo de busca não pode estar vazio");
+
+          const duplicatedRepo = repositories.find((r) => r.name === newRepo);
+          if (duplicatedRepo)
+            throw new Error("O Repositório já foi adicionado na lista");
+
+          // const response = await api.get(`repos/${newRepo}`);
+          // const data = {
+          //   name: response.data.full_name,
+          // };
           const data = {
-            name: response.data.full_name,
+            name: newRepo,
           };
 
           setRepositories([...repositories, data]);
           setNewRepo("");
-        } catch (err) {
-          alert(err.message + " Repositorio Invalido");
+        } catch ({ message, request }) {
+          let status = "";
+          if (request) status = request.status;
+          setError(true);
+
+          if (status === 404) setErrorMessage("Repositório não encontrado");
+          else setErrorMessage(message);
         } finally {
           setLoading(false);
         }
@@ -35,18 +66,28 @@ export default function Home() {
     [newRepo, repositories]
   );
 
+  const onDeleteClicked = useCallback(
+    (repoName) => {
+      const result = repositories.filter((r) => r.name !== repoName);
+      setRepositories(result);
+    },
+    [repositories]
+  );
+
   function handleOnChange(e) {
     setNewRepo(e.target.value);
+    setError(false);
+    setErrorMessage("");
   }
 
   return (
-    <Container>
+    <Container error={error}>
       <h1>
         <FaGithub size={25} />
         Meus Repositorios
       </h1>
 
-      <Form onSubmit={handleOnSubmit}>
+      <Form onSubmit={handleOnSubmit} error={error}>
         <input
           type="text"
           placeholder="Adicionar Repositorios"
@@ -61,6 +102,23 @@ export default function Home() {
           )}
         </SubmitButton>
       </Form>
+      <span>{errorMessage}</span>
+
+      <List>
+        {repositories.map((value, index) => (
+          <li key={index}>
+            <span>
+              <DeleteButton onClick={() => onDeleteClicked(value.name)}>
+                <FaTrash size={14} />
+              </DeleteButton>
+              {value.name}
+            </span>
+            <a href="">
+              <FaBars size={20} />
+            </a>
+          </li>
+        ))}
+      </List>
     </Container>
   );
 }
