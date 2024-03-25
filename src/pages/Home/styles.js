@@ -20,7 +20,7 @@ export const Container = styled.div`
     }
   }
 
-  &span {
+  span {
     color: ${(props) => (props.error ? "#FF0000" : "#000")};
     margin: 10px;
   }

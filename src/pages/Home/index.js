@@ -39,13 +39,13 @@ export default function Home() {
           if (duplicatedRepo)
             throw new Error("O Repositório já foi adicionado na lista");
 
-          // const response = await api.get(`repos/${newRepo}`);
-          // const data = {
-          //   name: response.data.full_name,
-          // };
+          const response = await api.get(`repos/${newRepo}`);
           const data = {
-            name: newRepo,
+            name: response.data.full_name,
           };
+          // const data = {
+          //   name: newRepo,
+          // };
 
           setRepositories([...repositories, data]);
           setNewRepo("");
@@ -107,12 +107,12 @@ export default function Home() {
       <List>
         {repositories.map((value, index) => (
           <li key={index}>
-            <span>
+            <div>
               <DeleteButton onClick={() => onDeleteClicked(value.name)}>
                 <FaTrash size={14} />
               </DeleteButton>
               {value.name}
-            </span>
+            </div>
             <a href="">
               <FaBars size={20} />
             </a>
