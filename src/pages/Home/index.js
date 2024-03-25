@@ -113,9 +113,8 @@ export default function Home() {
               </DeleteButton>
               {value.name}
             </div>
-            <a>
-              <FaBars size={20} />
-            </a>
+            {/* <a></a> */}
+            <FaBars size={20} />
           </li>
         ))}
       </List>
