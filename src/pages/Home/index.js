@@ -35,7 +35,10 @@ export default function Home() {
           if (newRepo === "")
             throw new Error("O Campo de busca não pode estar vazio");
 
-          const duplicatedRepo = repositories.find((r) => r.name === newRepo);
+          const duplicatedRepo = repositories.find(
+            (r) =>
+              r.name.toLocaleLowerCase() === newRepo.toLocaleLowerCase().trim()
+          );
           if (duplicatedRepo)
             throw new Error("O Repositório já foi adicionado na lista");
 
