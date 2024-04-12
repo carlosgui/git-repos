@@ -53,7 +53,7 @@ export default function Repositories() {
     }
 
     loadPageContent();
-  }, [page]);
+  }, [page, repo]);
 
   const handlePaginationButtons = (isBack) => {
     page >= 2 ? setDisableBack(false) : setDisableBack(true);
