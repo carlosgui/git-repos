@@ -142,9 +142,10 @@ export const PaginationContainer = styled.div`
     background-color: #333;
     opacity: 0.8;
     transition: 0.4ms;
-  }
-  button:disabled {
-    opacity: 0.3;
-    cursor: default;
+
+    &disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
   }
 `;

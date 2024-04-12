@@ -18,7 +18,6 @@ export default function Repositories() {
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [disableBack, setDisableBack] = useState(true);
   const loadingText = ["C", "A", "R", "R", "E", "G", "A", "N", "D", "O"];
 
   useEffect(() => {
@@ -56,7 +55,6 @@ export default function Repositories() {
   }, [page, repo]);
 
   const handlePaginationButtons = (isBack) => {
-    page >= 2 ? setDisableBack(false) : setDisableBack(true);
     if (isBack && page >= 2) {
       setPage(page - 1);
     }
@@ -113,7 +111,7 @@ export default function Repositories() {
         <PaginationContainer>
           <button
             onClick={() => handlePaginationButtons(true)}
-            disabled={disableBack}
+            disabled={page < 2}
           >
             Anterior
           </button>
