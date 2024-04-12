@@ -8,7 +8,7 @@ export default function Paths() {
     <BrowserRouter>
       <Routes>
         <Route exact path="/" Component={Home} />
-        <Route exact path="/repositories/:repo" Component={Repositories} />
+        <Route path="/repositories/:repo" Component={Repositories} />
       </Routes>
     </BrowserRouter>
   );

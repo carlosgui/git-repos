@@ -2,9 +2,10 @@ import React, { useState, useCallback, useEffect } from "react";
 import { Container, Form, SubmitButton, List, DeleteButton } from "./styles";
 import { FaBars, FaGithub, FaPlus, FaSpinner, FaTrash } from "react-icons/fa";
 import api from "../../services/api";
+import { Link } from "react-router-dom";
 
 export default function Home() {
-  const [newRepo, setNewRepo] = useState("facebook/react");
+  const [newRepo, setNewRepo] = useState("");
   const [repositories, setRepositories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -17,11 +18,6 @@ export default function Home() {
       setRepositories(JSON.parse(reposStoraged));
     }
   }, []);
-
-  // Save my repos at storage
-  useEffect(() => {
-    localStorage.setItem("repos", JSON.stringify(repositories));
-  }, [repositories]);
 
   const handleOnSubmit = useCallback(
     (e) => {
@@ -42,7 +38,11 @@ export default function Home() {
           if (duplicatedRepo)
             throw new Error("O Repositório já foi adicionado na lista");
 
-          const response = await api.get(`repos/${newRepo}`);
+          const response = await api.get(`repos/${newRepo}`, {
+            params: {
+              "User-Agent": "git-repos",
+            },
+          });
           const data = {
             name: response.data.full_name,
           };
@@ -50,7 +50,11 @@ export default function Home() {
           //   name: newRepo,
           // };
 
-          setRepositories([...repositories, data]);
+          setRepositories((state) => [...state, data]);
+          localStorage.setItem(
+            "repos",
+            JSON.stringify([...repositories, data])
+          );
           setNewRepo("");
         } catch ({ message, request }) {
           let status = "";
@@ -116,8 +120,9 @@ export default function Home() {
               </DeleteButton>
               {value.name}
             </div>
-            {/* <a></a> */}
-            <FaBars size={20} />
+            <Link to={`/repositories/${encodeURIComponent(value.name)}`}>
+              <FaBars size={20} />
+            </Link>
           </li>
         ))}
       </List>
