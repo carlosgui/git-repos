@@ -149,3 +149,27 @@ export const PaginationContainer = styled.div`
     }
   }
 `;
+
+export const FilterButtons = styled.div`
+  margin: 20px 0px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  button {
+    outline: 0;
+    border: 0;
+    padding: 8px;
+    border-radius: 8px;
+
+    & + button {
+      margin-left: 20px;
+    }
+
+    &:nth-child(${(props) => props.active + 1}) {
+      background-color: #0071db;
+      color: #fff;
+    }
+  }
+`;

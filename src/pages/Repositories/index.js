@@ -7,6 +7,7 @@ import {
   Owner,
   IssuesList,
   PaginationContainer,
+  FilterButtons,
 } from "./styles";
 
 import api from "../../services/api";
@@ -14,6 +15,13 @@ import { FaArrowLeft } from "react-icons/fa";
 
 export default function Repositories() {
   const { repo } = useParams();
+  const [filters, setFilters] = useState([
+    { state: "all", label: "Todas", active: true },
+    { state: "open", label: "Abertas", active: false },
+    { state: "closed", label: "Fechadas", active: false },
+  ]);
+  const [filterIndex, setFilterIndex] = useState(0);
+
   const [repository, setRepository] = useState({});
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,17 +30,15 @@ export default function Repositories() {
 
   useEffect(() => {
     async function load() {
-      // await setTimeout(async () => {
       const [repositorieData, issuesData] = await Promise.all([
         api.get(`/repos/${repo}`),
         api.get(`/repos/${repo}/issues`, {
-          params: { state: "open", per_page: 5 },
+          params: { state: "all", per_page: 5 },
         }),
       ]);
       setRepository(repositorieData.data);
       setIssues(issuesData.data);
       setLoading(false);
-      // }, 1200);
     }
 
     load();
@@ -42,7 +48,7 @@ export default function Repositories() {
     async function loadPageContent() {
       const { data } = await api.get(`/repos/${repo}/issues`, {
         params: {
-          state: "open",
+          state: filters[filterIndex].state,
           per_page: 5,
           page,
           "User-Agent": "git-repos",
@@ -52,7 +58,7 @@ export default function Repositories() {
     }
 
     loadPageContent();
-  }, [page, repo]);
+  }, [page, repo, filters, filterIndex]);
 
   const handlePaginationButtons = (isBack) => {
     if (isBack && page >= 2) {
@@ -60,6 +66,10 @@ export default function Repositories() {
     }
 
     setPage(page + 1);
+  };
+
+  const handleFilter = (index) => {
+    setFilterIndex(index);
   };
 
   if (loading) {
@@ -89,6 +99,14 @@ export default function Repositories() {
           <h1>{repository.name}</h1>
           <p>{repository.description}</p>
         </Owner>
+
+        <FilterButtons active={filterIndex}>
+          {filters.map((filter, index) => (
+            <button key={index} onClick={() => handleFilter(index)}>
+              {filter.label}
+            </button>
+          ))}
+        </FilterButtons>
 
         <IssuesList>
           {issues.map((issue) => (
